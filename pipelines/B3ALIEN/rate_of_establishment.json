@@ -1,0 +1,228 @@
+{
+  "nodes": [
+    {
+      "id": "0",
+      "type": "io",
+      "position": {
+        "x": 360,
+        "y": 180
+      },
+      "data": {
+        "descriptionFile": "b3alien>rate_of_establishment.yml"
+      }
+    },
+    {
+      "id": "1",
+      "type": "output",
+      "position": {
+        "x": 780,
+        "y": 70
+      },
+      "data": {
+        "label": "Rate outputs"
+      }
+    },
+    {
+      "id": "2",
+      "type": "output",
+      "position": {
+        "x": 780,
+        "y": 245
+      },
+      "data": {
+        "label": "Observation effort outputs"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "0",
+      "sourceHandle": "rate_table",
+      "target": "1",
+      "targetHandle": null,
+      "id": "reactflow__edge-0rate_table-1"
+    },
+    {
+      "source": "0",
+      "sourceHandle": "rate_plot",
+      "target": "1",
+      "targetHandle": null,
+      "id": "reactflow__edge-0rate_plot-1"
+    },
+    {
+      "source": "0",
+      "sourceHandle": "cumulative_species",
+      "target": "1",
+      "targetHandle": null,
+      "id": "reactflow__edge-0cumulative_species-1"
+    },
+    {
+      "source": "0",
+      "sourceHandle": "summary",
+      "target": "1",
+      "targetHandle": null,
+      "id": "reactflow__edge-0summary-1"
+    },
+    {
+      "source": "0",
+      "sourceHandle": "observation_effort_map_html",
+      "target": "2",
+      "targetHandle": null,
+      "id": "reactflow__edge-0observation_effort_map_html-2"
+    },
+    {
+      "source": "0",
+      "sourceHandle": "observation_effort_raster",
+      "target": "2",
+      "targetHandle": null,
+      "id": "reactflow__edge-0observation_effort_raster-2"
+    }
+  ],
+  "inputs": {
+    "b3alien>rate_of_establishment.yml@0|cube_path": {
+      "description": "Path to a GeoParquet occurrence cube. Google Cloud Storage paths such as gs://bucket/data.parquet are supported when runner credentials allow access. Local files must be visible inside the BIAB runner, for example /userdata/data.parquet; host paths such as /Users/... are not mounted in the runner container.",
+      "label": "Biodiversity data cube path",
+      "type": "text",
+      "example": "gs://b-cubed-eu/data_BE.parquet",
+      "weight": 0
+    },
+    "b3alien>rate_of_establishment.yml@0|google_project": {
+      "description": "Google Cloud project used by gcsfs when reading a gs:// cube. Leave blank for local files or default Google credentials.",
+      "label": "Google Cloud project",
+      "type": "text",
+      "example": null,
+      "weight": 1
+    },
+    "b3alien>rate_of_establishment.yml@0|checklist_path": {
+      "description": "Path to a prepared GRIIS merged_distr.txt file, or to a directory containing merged_distr.txt. Local files must be visible inside the BIAB runner, for example /userdata/merged_distr.txt.",
+      "label": "GRIIS checklist path",
+      "type": "text",
+      "example": "/userdata/dwca-griis-country/merged_distr.txt",
+      "weight": 2
+    },
+    "b3alien>rate_of_establishment.yml@0|start_year": {
+      "description": "First year included in the Solow-Costello rate calculation.",
+      "label": "Start year",
+      "type": "int",
+      "example": 1970,
+      "weight": 3
+    },
+    "b3alien>rate_of_establishment.yml@0|end_year": {
+      "description": "Last year included in the Solow-Costello rate calculation.",
+      "label": "End year",
+      "type": "int",
+      "example": 2022,
+      "weight": 4
+    },
+    "b3alien>rate_of_establishment.yml@0|survey_effort_measure": {
+      "description": "Measure used for the observation effort map and time series. Distinct observers requires a distinctobservers column in the cube.",
+      "label": "Survey effort measure",
+      "type": "options",
+      "options": [
+        "total_occurrences",
+        "distinct_observers"
+      ],
+      "example": "total_occurrences",
+      "weight": 5
+    },
+    "b3alien>rate_of_establishment.yml@0|taxon_rank": {
+      "description": "Cube column used for optional taxonomic filtering of observation effort, for example kingdom, phylum, class, order, family, or genus.",
+      "label": "Taxon rank filter",
+      "type": "text",
+      "example": "kingdom",
+      "weight": 6
+    },
+    "b3alien>rate_of_establishment.yml@0|taxon_name": {
+      "description": "Optional taxon value used to filter observation effort. Leave blank to summarize all taxa.",
+      "label": "Taxon name filter",
+      "type": "text",
+      "example": "Plantae",
+      "weight": 7
+    },
+    "b3alien>rate_of_establishment.yml@0|map_scale": {
+      "description": "Scale used to colour the observation effort map.",
+      "label": "Map scale",
+      "type": "options",
+      "options": [
+        "log10",
+        "raw"
+      ],
+      "example": "log10",
+      "weight": 8
+    },
+    "b3alien>rate_of_establishment.yml@0|map_simplification_tolerance": {
+      "description": "Geometry simplification tolerance in degrees for the interactive HTML map. Use 0 to disable simplification.",
+      "label": "Map simplification tolerance",
+      "type": "float",
+      "example": 0.01,
+      "weight": 9
+    },
+    "b3alien>rate_of_establishment.yml@0|bootstrap_iterations": {
+      "description": "Number of bootstrap iterations for the Solow-Costello confidence interval. Use 0 to skip bootstrapping.",
+      "label": "Bootstrap iterations",
+      "type": "int",
+      "example": 0,
+      "weight": 10
+    }
+  },
+  "outputs": {
+    "b3alien>rate_of_establishment.yml@0|rate_table": {
+      "description": "Annual observed establishment rate, Solow-Costello fitted rate, and cumulative establishment values.",
+      "label": "Rate of establishment table",
+      "type": "text/csv",
+      "weight": 0
+    },
+    "b3alien>rate_of_establishment.yml@0|rate_plot": {
+      "description": "Plot of annual establishment rate, Solow-Costello fitted rate, and cumulative establishments.",
+      "label": "Rate of establishment plot",
+      "type": "image/png",
+      "weight": 1
+    },
+    "b3alien>rate_of_establishment.yml@0|cumulative_species": {
+      "description": "Cumulative number of checklist species observed through time in the occurrence cube.",
+      "label": "Cumulative alien species",
+      "type": "text/csv",
+      "weight": 2
+    },
+    "b3alien>rate_of_establishment.yml@0|summary": {
+      "description": "JSON summary containing fitted change in rate of establishment and input metadata.",
+      "label": "Run summary",
+      "type": "application/json",
+      "weight": 3
+    },
+    "b3alien>rate_of_establishment.yml@0|observation_effort_map_html": {
+      "description": "Self-contained interactive Leaflet/Folium map with grid cells colored continuously by observation effort and a matching legend. Use this for a correctly colored visualization.",
+      "label": "Observation effort map (interactive HTML)",
+      "type": "text/html",
+      "weight": 5
+    },
+    "b3alien>rate_of_establishment.yml@0|observation_effort_raster": {
+      "description": "Cloud-Optimized GeoTIFF with one pixel per grid cell, valued by observation effort (map_value scale). Renders with continuous per-pixel color styling and a legend in the BIAB embedded map, since that path applies a colormap and rescale automatically, unlike the geo+json vector viewer.",
+      "label": "Observation effort map (raster)",
+      "type": "image/tiff;application=geotiff",
+      "weight": 6
+    }
+  },
+  "metadata": {
+    "name": "B3ALIEN rate of establishment",
+    "description": "Calculate the GBF Target 6 rate of alien species establishment from a b3alien biodiversity data cube and a prepared GRIIS checklist. The pipeline loads a GeoParquet cube from a local path or Google Cloud Storage, calculates cumulative alien species and annual establishment rates using b3alien, fits the Solow-Costello model, and exports observation effort maps and tables.",
+    "lifecycle": {
+      "status": "in_development"
+    },
+    "author": [
+      {
+        "name": "Maarten Trekels",
+        "email": "maarten.trekels@plantentuinmeise.be",
+        "role": "b3alien package development"
+      }
+    ],
+    "license": "MIT",
+    "external_link": "https://b3alien.readthedocs.io/en/latest/",
+    "references": [
+      {
+        "text": "b3alien Python package documentation",
+        "link": "https://b3alien.readthedocs.io/en/latest/"
+      }
+    ]
+  }
+}

@@ -1,0 +1,135 @@
+script: rate_of_establishment.py
+name: B3ALIEN Rate of Establishment
+description: |
+  Load a GeoParquet biodiversity data cube from a local path or Google Cloud Storage, calculate the rate of alien species establishment with the b3alien Python package, and map observation effort by grid cell.
+author:
+  - name: Maarten Trekels
+    email: maarten.trekels@plantentuinmeise.be
+    role: b3alien package development
+license: MIT
+external_link: https://b3alien.readthedocs.io/en/latest/
+lifecycle:
+  status: in_development
+timeout: 120
+inputs:
+  cube_path:
+    label: Biodiversity data cube path
+    description: Path to a GeoParquet occurrence cube. Google Cloud Storage paths such as gs://bucket/data.parquet are supported when runner credentials allow access. Local files must be visible inside the BIAB runner, for example /userdata/data.parquet; host paths such as /Users/... are not mounted in the runner container.
+    type: text
+    example: gs://b-cubed-eu/data_BE.parquet
+  google_project:
+    label: Google Cloud project
+    description: Google Cloud project used by gcsfs when reading a gs:// cube. Leave blank for local files or default Google credentials.
+    type: text
+    example: null
+  checklist_path:
+    label: GRIIS checklist path
+    description: Path to a prepared GRIIS merged_distr.txt file, or to a directory containing merged_distr.txt. Local files must be visible inside the BIAB runner, for example /userdata/merged_distr.txt.
+    type: text
+    example: /userdata/dwca-griis-country/merged_distr.txt
+  start_year:
+    label: Start year
+    description: First year included in the Solow-Costello rate calculation.
+    type: int
+    example: 1970
+  end_year:
+    label: End year
+    description: Last year included in the Solow-Costello rate calculation.
+    type: int
+    example: 2022
+  survey_effort_measure:
+    label: Survey effort measure
+    description: Measure used for the observation effort map and time series. Distinct observers requires a distinctobservers column in the cube.
+    type: options
+    options:
+      - total_occurrences
+      - distinct_observers
+    example: total_occurrences
+  taxon_rank:
+    label: Taxon rank filter
+    description: Cube column used for optional taxonomic filtering of observation effort, for example kingdom, phylum, class, order, family, or genus.
+    type: text
+    example: kingdom
+  taxon_name:
+    label: Taxon name filter
+    description: Optional taxon value used to filter observation effort. Leave blank to summarize all taxa.
+    type: text
+    example: Plantae
+  map_scale:
+    label: Map scale
+    description: Scale used to colour the observation effort map.
+    type: options
+    options:
+      - log10
+      - raw
+    example: log10
+  map_simplification_tolerance:
+    label: Map simplification tolerance
+    description: Geometry simplification tolerance in degrees for the interactive HTML map. Use 0 to disable simplification.
+    type: float
+    example: 0.01
+  bootstrap_iterations:
+    label: Bootstrap iterations
+    description: Number of bootstrap iterations for the Solow-Costello confidence interval. Use 0 to skip bootstrapping.
+    type: int
+    example: 0
+outputs:
+  rate_table:
+    label: Rate of establishment table
+    description: Annual observed establishment rate, Solow-Costello fitted rate, and cumulative establishment values.
+    type: text/csv
+  rate_plot:
+    label: Rate of establishment plot
+    description: Plot of annual establishment rate, Solow-Costello fitted rate, and cumulative establishments.
+    type: image/png
+  cumulative_species:
+    label: Cumulative alien species
+    description: Cumulative number of checklist species observed through time in the occurrence cube.
+    type: text/csv
+  # observation_effort_map disabled for now: BIAB's embedded geo+json viewer
+  # doesn't apply continuous per-feature color styling; the script still
+  # generates the file, use observation_effort_raster or _map_html instead.
+  # observation_effort_map:
+  #   label: Observation effort map
+  #   description: GeoJSON map layer with observation effort by grid cell. Includes simplestyle fill/stroke properties per feature, but the BIAB embedded geo+json viewer does not apply continuous per-feature color styling from these properties; use observation_effort_map_html for a correctly colored map.
+  #   type: application/geo+json
+  observation_effort_map_html:
+    label: Observation effort map (interactive HTML)
+    description: Self-contained interactive Leaflet/Folium map with grid cells colored continuously by observation effort and a matching legend. Use this for a correctly colored visualization.
+    type: text/html
+  observation_effort_raster:
+    label: Observation effort map (raster)
+    description: Cloud-Optimized GeoTIFF with one pixel per grid cell, valued by observation effort (map_value scale). Renders with continuous per-pixel color styling and a legend in the BIAB embedded map, since that path applies a colormap and rescale automatically, unlike the geo+json vector viewer.
+    type: image/tiff;application=geotiff
+  # observation_effort_timeseries disabled for now; the script still generates the file.
+  # observation_effort_timeseries:
+  #   label: Observation effort time series
+  #   description: Annual observation effort summarized from the cube.
+  #   type: text/csv
+  summary:
+    label: Run summary
+    description: JSON summary containing fitted change in rate of establishment and input metadata.
+    type: application/json
+conda:
+  channels:
+    - conda-forge
+  dependencies:
+    - python>=3.10
+    - pip
+    - geopandas>=1.0.1
+    - pyarrow
+    - gcsfs
+    - folium
+    - matplotlib
+    - rasterio
+    - numpy<2.4
+    - pandas
+    - scipy
+    - shapely
+    - dask
+    - xarray
+    - sparse
+    - tqdm
+    - ipython
+    - pip:
+        - b3alien>=0.4.0
